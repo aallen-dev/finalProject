@@ -5,7 +5,7 @@
     "main": "server.js",
     "scripts": {
         "build-all:css": "node-sass ./scss/**.scss -o ./dist",
-        "build:css": "node ./node_modules/.bin/node-sass ./scss/style.scss --stdout | autoprefixer -b 'last 10 versions' > ./dist/style.css; [ -f ./dist/style.css ] && csso ./dist/style.css ./dist/style.css; tput bel; echo '--------- sassified.'",
+        "build:css": "node ./node_modules/.bin/node-sass ./scss/style.scss --stdout | autoprefixer -b 'last 10 versions' > ./dist/style.css; [ -f ./dist/style.css ] && csso ./dist/style.css ./dist/style.css; say 'done,'; echo '--------- sassified.'",
         "watch:css": "watch 'npm run build:css' ./scss/",
         "test": "mocha ./js/test/; echo '----- tests done';",
         "lint": "jshint ./js/**.js; echo '----- linting done';",

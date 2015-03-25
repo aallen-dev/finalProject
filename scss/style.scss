@@ -8,6 +8,7 @@
 
 *, *:before, *:after {
     box-sizing: border-box;
+    // border:1px solid red
 }
 
 /**
@@ -37,8 +38,65 @@
     }
 }
 
-@include gridify(2, 400);
-@include gridify(4, 600);
+@include gridify(2, 100 , 0);
+@include gridify(3, 100 , 0);
+@include gridify(4, 100 , 0);
+@include gridify(8, 100 , 0);
+
+// $pad: 30px;
+
+// .grid {
+//   // background: white;
+//   margin: 0 0 $pad 0;
+  
+//   &:after {
+//     /* Or @extend clearfix */
+//     content: "";
+//     display: table;
+//     clear: both;
+//   }
+// }
+
+// [class*='col-'] {
+//     float: left;
+//     padding-right: $pad;
+//     // padding-top: $pad;
+//     // text-align: right;
+
+//     .grid &:last-of-type {
+//         // text-align: center;
+//         padding-right: 0;
+//     }
+// }
+// .col-1-8 {
+//     width: 12.5%;
+// }
+// .col-1-4 {
+//     width: 25%;
+// }
+// .col-1-3 {
+//     width: 33.33%;
+// }
+// .col-1-2 {
+//     width: 50%;
+// }
+// .col-2-3 {
+//     width: 66.66%;
+// }
+
+// .module {
+//   padding: $pad;
+//     border:1px solid blue;
+//   background: #eee;
+// }
+
+// /* Opt-in outside padding */
+// .grid-pad {
+//   padding: $pad 0 $pad $pad;
+//   [class*='col-']:last-of-type {
+//     padding-right: $pad;
+//   }
+// }
 
 /**
  * PACE (automatic pre-loader thingy)
@@ -72,9 +130,225 @@
 /**
  * GENERAL
  */
-
-img {max-width:100%;}
-
-body {
-    transition: opacity .25s ease;
+html , body {
+    height:100%;
 }
+.centerit{
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50% , -50%);
+}
+img {max-width:100%;}
+*{
+    // transition: all 1s ease;
+
+}
+body {
+    transition: opacity 1s ease;
+    #payment-form{display:none}
+    .container{
+        height:100%;
+        overflow:hidden;
+        span:empty{
+            height:5px !important;
+        }
+        input , button{
+
+            outline-width: 0;
+
+        }
+        div{
+            height:100%;
+        }
+        
+        .title{
+            height:5%;
+            border-bottom:2px solid #666;
+            text-align: center;
+        }
+
+        .login{
+            width:50%;
+            height:50%;
+            .val{
+                border:0px solid blue;
+                text-align: center;
+                border-bottom:4px solid blue;
+                width:100%;
+            }
+            &>.grid{
+                // height:100%;
+                
+                &>button{
+                    height:25%;
+                    // border:1px solid red;
+                    // background-color:#ccc ;
+                    text-align: center;
+                }
+            }
+        } 
+        .leftPane{
+            float:left;
+            // height:100%;
+            width:30%;
+            padding:10px;
+            border-right:3px solid #ddd;
+            &>* {
+                // color:red;
+                    width:100%
+
+                input{
+                    // font-size:20px
+                }
+                div{
+                    font-size:20px
+                }
+                &>* {
+                    margin-top:10px;
+                    width:100%
+
+                }
+            }
+        }
+        .content{
+            float:left;
+            border-top:1px solid #ccc;
+            height:95%;
+            width:70%;
+        }
+        .content::after{
+            clear:both
+        }
+        .grid{
+            // overflow-y:auto;
+            // height:100%;
+            &>*{
+                text-align: center;
+                height:50px;
+            }
+        }
+        .formControls{
+            // border:1px solid red;
+            margin-top:50px;
+            // height:200px;
+
+        }
+        .grid.grid-4-100{
+            // height:100%;
+            
+            &>*{
+                // width:23%;
+                height:25%;
+                // margin:1%;
+                // border-radius: 10px;
+                
+            }
+        }
+        .grid.grid-8-100{
+            // height:100%;
+            &>*{
+                // color:red;
+                // border-radius: 5px;
+                // margin:0.1%;
+                // height:10%;
+                height:12.5%;
+            }
+            
+        }
+        .content.grid.grid-2-100{
+            // height:50px;
+            font-size: 25px;
+            &>*{
+                margin-top: 10px;
+                
+                &>div{
+                    height:auto;
+                    // border:1px solid red;
+                }
+            }
+        }
+        .itemDesc{
+            border-bottom:1px solid #ddd;
+            width:80%;
+            text-align: left;
+            padding-left:5px;
+            font-size: 15px !important;
+        }
+        .itemPrice{
+            font-size: 15px !important;
+            text-align: right;
+            padding-right:15px;
+            width:20%;
+            border-bottom:1px solid #ddd;
+        }
+        .closed {
+            opacity:.5
+        }
+        button:empty{
+            opacity:.2
+        }
+        *{
+            // border:1px solid red
+        }
+        .back{
+            color:red
+        }
+        .previewOrder{
+            // position:relative;
+            display:inline-block;
+            height:100%;
+            border:1px solid #aaa;
+        }
+        .preview:empty{
+            display:none;
+        }
+        .preview{
+            z-index: 9999;
+            display:block;
+            position:absolute;
+        }
+        .previewCont{
+        
+            display:block;
+            position:relative;
+            height:auto;
+            padding: 3px;
+            border:2px solid #4d4;
+            background-color:#ccc;
+            margin-top: 25px;
+            &>button{
+                display:block;
+                position:relative;
+                width:90%;
+            }
+        }
+        input[type=checkbox]{
+            
+            /* Double-sized Checkboxes */
+            -ms-transform:  scale(3); /* IE */
+            -moz-transform:  scale(3); /* FF */
+            -webkit-transform:  scale(3); /* Safari and Chrome */
+            -o-transform:  scale(3); /* Opera */
+            // padding: 10px;
+        }
+    }
+
+}
+
+
+
+
+
+.grid.orderList {
+  // color: red;
+  overflow-y: auto;
+  height: 100% !important;
+}
+.red{
+    background-color:red;
+    color:#fff;
+}
+
+
+

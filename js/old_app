@@ -1,0 +1,746 @@
+window.onload = app;
+
+// runs when the DOM is loaded
+function app(){
+    "use strict";
+
+    // uncomment the following line to cache CSS/JS files loaded by loader in localStorage
+    // NOTE: you may need to turn this off while developing
+    // loader.textInjection = true;
+
+    // load some scripts (uses promises :D)
+    loader.load(
+        //css
+        {url: "./dist/style.css"},
+        //js
+        {url: "./bower_components/jquery/dist/jquery.min.js"},
+        {url: "./bower_components/lodash/lodash.min.js"},
+
+        // when using just Backbone, use this line
+        {url: "./bower_components/backbone/backbone.js"},
+        // when using Parse, comment out the above line and uncomment the line below
+        // {url: "./bower_components/parse-js-sdk/lib/parse.min.js"},
+
+        // when using React (and the plugin JSnoX), uncomment the following two lines
+        {url: "./bower_components/react/react.min.js"},
+        {url: "./bower_components/jsnox/jsnox.js"},
+
+        // other stuff
+        // {url: "./bower_components/pace/pace.min.js"},
+        {url: "./js/interact.js"},
+        {url: "./js/TemplateView.js"}
+    ).then(function(){
+        // if turning on JSnoX, uncommment the following line
+        window.d = jsnox(React);
+        // if turning on React, uncomment the following line
+        React.initializeTouchEvents(true);
+        // target elements with the "draggable" class
+        interact('.draggable')
+            .draggable({
+                // enable inertial throwing
+                inertia: true,
+                // keep the element within the area of it's parent
+                restrict: {
+                    restriction: "parent",
+                    endOnly: true,
+                    elementRect: {
+                        top: 0,
+                        left: 0,
+                        bottom: 1,
+                        right: 1
+                    }
+                },
+
+                // call this function on every dragmove event
+                onmove: function(event) {
+                    var target = event.target,
+                        // keep the dragged position in the data-x/data-y attributes
+                        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+                        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+                    // translate the element
+                    target.style.webkitTransform =
+                        target.style.transform =
+                        'translate(' + x + 'px, ' + y + 'px)';
+
+                    // update the posiion attributes
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+                },
+                // call this function on every dragend event
+                onend: function(event) {
+                    var textEl = event.target.querySelector('p');
+
+                    textEl && (textEl.textContent =
+                        'moved a distance of ' + (Math.sqrt(event.dx * event.dx +
+                            event.dy * event.dy) | 0) + 'px');
+                }
+        });
+
+        document.querySelector("html").style.opacity = 1;
+        // start app?
+        JSON.copy || (JSON.copy = function(d){return JSON.parse(JSON.stringify(d));});
+        //////////////////////////
+        //
+ 
+        window.bw || (window.bw = {}) ,
+        bw.menu   || (bw.menu   = {});
+        bw.menu.cache = {};
+
+        bw.menu = {
+
+            getAll : function() {
+                // $BASE_URL = https://evening-basin-4204.herokuapp.com/api/v1
+                // Show all menu items
+                // GET $BASE_URL/menu_items
+                return $.get('https://evening-basin-4204.herokuapp.com/api/v1/menu_items')
+            } ,
+            cashAll : function(){
+                
+                var p = $.Deferred()
+
+                this.getAll().then(function(d){
+                    console.log(d)
+                    
+                    bw.menu.cache = d.menu_items.map(function(item) {
+
+                        // until the db is updated I need to hack the name to store additional data for each record :(
+                        // this /should/ be harmless once the db is updated and just do nothing...
+
+                        var data = item.name.split('{{json}}')[1]
+                        
+                        if (data) {
+                            data = JSON.parse(data);
+
+                            _.forEach(data , function(val , key){
+                                item[key] = val;
+                            })
+                        }
+
+                        item.name = item.name.split('{{json}}')[0]
+                        
+                        return item;
+                    })
+                    p.resolve();
+                })
+                return p;
+            } ,
+            sortBy : function (key) {
+                var x = {}
+
+                _.map(bw.menu.cache , function(item) {
+
+                    if (!x[item[key]])
+                        x[item[key]] = [];
+
+                    x[item[key]].push(item)
+
+                })
+                return x;
+            } ,
+            getBy : function (filter , matches) {
+                
+                // var x = $.Deferred()
+                return _.filter(bw.menu.cache , function(item,id,c) {
+
+                    // debugger
+                    return item[filter] && item[filter] == matches
+                })
+            } ,
+            add:function(item) {
+                // Create Menu Item
+                // Enter price in cents
+                // Parent id is the parent, set to 0 for highest level
+                // POST $BASE_URL/menu_items
+                // { "menu_item": { "level": "1", "name": "Fajita", "price": "1000", "parent_id": "0"} }
+                var testDat = { "menu_item": { "level": "1", "name": "Fajita2", "price": "1000", "parent_id": "0"} };
+                var tmp// = {}
+                _.forEach(item , function(val , key , obj){
+
+                    if (key=='level'||key=='price'||key=='parent_id'||key=='name'||key=='id')
+                        return
+                    if (!tmp)
+                        tmp = {};
+                    tmp[key] = val;
+                    delete obj[key]
+                })
+                if (tmp)
+                    item.name = item.name.split('{{json}}')[0]+'{{json}}'+JSON.stringify(tmp)
+
+                return $.post('https://evening-basin-4204.herokuapp.com/api/v1/menu_items' , {menu_item:item});
+            } ,
+            update : function(item) {
+                // Update Menu Item
+                // Same parameter format as Create Menu Item
+                // :id is the id of the menu item
+                // PATCH $BASE_URL/menu_items/:id
+
+                // rejigger data
+                // the db only understands certain fields right now, so we need to remove any custom fields and append them to the name field as a json object
+                var tmp// = {}
+                _.forEach(item , function(val , key , obj){
+
+                    if (key=='level'||key=='price'||key=='parent_id'||key=='name'||key=='id')
+                        return
+                    if (!tmp)
+                        tmp = {};
+                    tmp[key] = val;
+                    delete obj[key]
+                })
+                if (tmp)
+                    item.name = item.name.split('{{json}}')[0]+'{{json}}'+JSON.stringify(tmp)
+                // debugger;return;
+                return $.ajax({
+                    url  : 'https://evening-basin-4204.herokuapp.com/api/v1/menu_items/'+item.id,
+                    type : 'PUT' ,
+                    data : {menu_item:item}
+                });
+            },
+            delete : function(id) {
+                // Delete a menu item
+                // DELETE $BASE_URL/menu_items/:id
+                return $.ajax({
+                    url: 'https://evening-basin-4204.herokuapp.com/api/v1/menu_items/'+id,
+                    type: 'DELETE'
+                });
+            },
+            get : function(options) {
+                // Show One Menu Item
+                // GET $BASE_URL/menu_items/:id
+                return $.get('https://evening-basin-4204.herokuapp.com/api/v1/menu_items/'+options.id);
+            }
+        }
+
+        //
+        //////////////////////////
+        //////////////////////////
+        // testing
+            // 
+
+            $.ajaxSetup({
+                headers: {'PIN'  : '22978'} // temp admin pass
+            });
+            bw.menu.getAll().then(function(data){
+                console.log(data)
+            })
+            
+            // bw.menu.get({id:7}).then(function(data) {
+            //     data.menu_item.name = 'item 7'
+            //     bw.menu.update({data:data , id:7}).then(function() {
+            //         bw.menu.get({id:7}).then(function(d2) {
+            //             console.log(d2)
+            //         })
+            //     })
+            // })
+            // bw.menu.cashAll().then(function() {
+            //     // debugger
+            //     var item = bw.menu.getBy('id','6')[0];
+
+            //     item.name = 'steaks';
+            //     // item.level = 2;
+            //     item.items = ',,1,,,,,,,,,,3,,,,,,,,,,,,,'
+            //     // delete item.moreInfozz// = 'zzstuff'
+
+            //     bw.menu.update(item).then(function() {
+            //         bw.menu.get({id:6}).then(function(d2) {
+            //             console.log(d2)
+            //         })
+            //     })
+            // })
+            // $.ajax({
+            //     url: 'https://evening-basin-4204.herokuapp.com/api/v1/menu_items/11',
+            //     type: 'DELETE'
+            //     // success: function(result) {
+            //     //     // Do something with the result
+            //     // }
+            // })
+            //bw.menu.delete(12)
+            // bw.menu.add({ level: '1', name: 'burgers' , items:',,,,,4,,,,,,', price: '1000', parent_id: '0'})
+            //     .then(function(){
+
+            //         bw.menu.getAll().then(function(data){
+            //             console.log(data)
+            //         })
+
+            //     })
+
+            //
+            //
+        //////////////////////////
+
+        //////////////////////////
+        //
+        window.bw || (window.bw = {}) ,
+        bw.users  || (bw.users  = {});
+
+        bw.users = {
+        
+            getAll : function() {
+                // $BASE_URL = https://evening-basin-4204.herokuapp.com/api/v1
+
+                // Show all users
+                // GET $BASE_URL/users
+                return $.get('https://evening-basin-4204.herokuapp.com/api/v1/users')
+            } ,
+            add : function(data) {
+                // Create User
+                // POST $BASE_URL/users
+                // { "user": { "name": "Jon Snow", "email": "jon@snow.com", "password": ""blah", "password_confirmation": "blah", "employee": "true", "admin": "false" } }
+                // debugger
+                return $.post('https://evening-basin-4204.herokuapp.com/api/v1/users' , data)
+            } ,
+            update : function(options) {
+                // Update User
+                // Same parameter format as Create User
+                // :id is the id of the User
+                // PUT $BASE_URL/users/:id
+                return $.ajax({
+                    url  : 'https://evening-basin-4204.herokuapp.com/api/v1/users/'+options.id,
+                    type : 'PUT' ,
+                    data : options.data
+                });
+            } ,
+            get : function(options) {
+
+                // Show One User
+                // GET $BASE_URL/user/:id
+                return $.get('https://evening-basin-4204.herokuapp.com/api/v1/users/'+options.id)
+            } ,
+            delete : function(id) {
+
+                // Delete a user
+                // DELETE $BASE_URL/users/:id
+                return $.ajax({
+                    url: 'https://evening-basin-4204.herokuapp.com/api/v1/users/'+id,
+                    type: 'DELETE'
+                });
+            } 
+        }
+        //
+        //////////////////////////
+        //////////////////////////
+        // testing
+            // 
+
+            // $.ajaxSetup({
+            //     headers: {'PIN'  : ''}
+            // });
+
+            // bw.users.getAll().then(function(data){
+
+            //     console.log(data)
+
+            // })
+            // bw.users.add({
+            //     "user": {
+            //         "name"      : "John Snow",
+            //         "email"     : "jon@snow.com",
+            //         "password"  : "1234",
+            //         "employee"  : "true",
+            //         "admin"     : "false" ,
+            //         "password_confirmation" : "1234"
+            //     }
+            // }).then(function(data){
+
+            //     console.log(data)
+
+            // })
+            // bw.users.get({id:10}).then(function(data) {
+            //     console.log(data)
+            // })
+            // bw.users.get({id:8}).then(function(data) {
+            //     data.user.name = 'guy smith'
+            //     bw.users.update({data:data , id:8}).then(function() {
+
+            //         bw.users.getAll().then(function(data){
+
+            //             console.log(data)
+
+            //         });
+            //     });
+            // });
+            
+            // bw.users.delete(4).then(function() {
+
+            //     bw.users.getAll().then(function(data){
+
+            //         console.log(data)
+
+            //     });
+            // });
+
+            //
+            //
+        //////////////////////////
+
+        //////////////////////////
+        //
+        window.bw || (window.bw = {}) ,
+        bw.user   || (bw.user   = {});
+        bw.user = {
+
+            login:function(pin){
+                // $BASE_URL = https://evening-basin-4204.herokuapp.com/api/v1/sessions
+
+
+                // Log in user
+                // POST $BASE_URL
+                // Will return a user object with an authentication_token. Pass this token to other requests.
+
+                return $.ajax({
+                    url:'https://evening-basin-4204.herokuapp.com/api/v1/sessions' ,
+                    type : 'POST' ,
+                    data:{pin:pin} ,
+                    success:function(){
+                        console.log('pass')
+                        $.ajaxSetup({
+                            headers: {'PIN'  : pin}
+                        });
+                    } ,
+                    error:function(){
+                        console.log('fail')
+                    }
+                });
+            } ,
+            logout:function(){
+
+                // Log out user
+                $.ajaxSetup({
+                    headers: {'PIN'  : ''}
+                });
+            }
+
+        };
+        //
+        //////////////////////////
+        //////////////////////////
+        //testing
+            //
+
+            // bw.user.login('22978').then(function() {// temp admin pass
+
+            //     bw.users.getAll().then(function(data) {
+
+            //         console.log(data)
+            //         debugger
+            //         bw.users.get({id:2}).then(function(response) {
+
+            //             response.user.name = 'jo blo';//'1234'
+            //             debugger
+            //             bw.users.update({data:response , id:2}).then(function() {
+
+            //                 bw.users.getAll().then(function(data){
+
+            //                     console.log(data)
+
+            //                 });
+            //             });
+            //         })
+            //         // bw.user.logout()
+
+                    
+            //     })
+
+            // })
+
+            // $.ajax({
+            //     url  : 'https://evening-basin-4204.herokuapp.com/api/v1/sessions',
+            //     type : 'POST' ,
+            //     // headers: {'x-PIN'  : '22978'}// temp admin pass
+            //     data : {'PIN':'22978'}
+            // });
+            //
+            //
+        //////////////////////////
+
+        //////////////////////////
+        //
+        window.bw     || (window.bw     = {}) ,
+        bw.menu       || (bw.menu       = {}) ,
+        bw.menu.views || (bw.menu.veiws = {});
+
+        bw.menu.veiws.editMenu = React.createClass({
+
+            _moveItem:function(e,reactid) {
+                
+                // debugger
+                //
+                
+                if (/empty/.exec(reactid))
+                    return;
+
+                var menuId = /@mod.*$/.exec(reactid)[0].replace(/[^0-9]/g,'');
+                
+                var width = $(e.currentTarget).width();
+                var height = $(e.currentTarget).height();
+
+                var newX = Math.abs(Math.round((-(this.props.xStart - this.props.xStart - e.clientX)/width)-3 ));
+                var newY = Math.abs(Math.round((-(this.props.yStart - this.props.yStart - e.clientY)/height)-1));
+
+                var index = this.props.editing.indexOf(menuId);
+                
+                // prevent overwriting
+                if (this.props.editing[newX + newY*8])
+                    return false;
+                
+                this.props.editing[index] = null;
+                this.props.editing[newX + newY*8] = menuId;
+                
+                // save changes
+                var item = bw.menu.getBy('id' , this.props.openGroup)[0]
+                item.items = this.props.editing.join(',');
+                bw.menu.update(JSON.copy(item));
+
+                this.forceUpdate();
+
+            } ,
+            _getStartPos:function(e,reactid) {
+                this.props.yStart = e.clientY
+                this.props.xStart = e.clientX
+            } ,
+            _dragging:function(e,reactid) {
+                // console.log(e.clientY)
+            } ,
+            _openGroup:function(e,reactid) {
+
+                    // var menuId = /\[menuId.*?\]/.exec(this.getAttribute('data-reactid'))[0].replace(/\[|\]/g,'').split('=')[1]
+                    
+                    // extract the id from the reactid
+                    var menuId = /@group.*$/.exec(reactid)[0].replace(/[^0-9]/g,'');
+
+                    var item = bw.menu.getBy('id',menuId)[0]
+                    
+                    this.props.openGroup = menuId;
+                    this.props.editing = item.items.split(',');
+                    
+                    // pad our array to the appropriate length
+                    while(this.props.editing.length<64)
+                        this.props.editing.push(null)
+
+                    this.forceUpdate()
+            } ,
+            
+            componentWillMount:function() {
+
+                this.props.editing = [,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,]
+
+            },
+            componentDidMount:function() {
+
+                var self = this;
+                var node = function(s){return $(self.refs[s].getDOMNode())}
+
+                node('back').on('click' , function() {
+
+                    React.render(
+                        React.createElement(bw.menu.veiws.admin) ,
+                        $('.container')[0]
+                    );
+
+                });
+
+            } ,
+
+            render:function(){
+                var self = this;
+                this.props.topLevel = ['back'].concat(bw.menu.getBy('level' , '1'))
+                this.props.topLevel.push('new')
+
+                return d('div' , [
+                    
+                    d('div.leftPane@controls.grid' , _.map(this.props.topLevel , function(item,i) {
+                        
+                        if (typeof item==='string') {
+                            var ref = (item?item.replace(/ /g,''):i);
+                            return d('button.'+ref+'@'+ref , item||'');
+                        }
+                        return d('button.menuGroup@group'+item.id ,
+                                 {onClick : self._openGroup , menuId:item.id} ,
+                                 item.name||'');
+                    
+                    })) ,
+
+                    d('div.content.grid.grid-8-100' , _.map(this.props.editing,function(v,i) {
+                        var name = v?bw.menu.getBy('id',v)[0].name:'';
+                        return d('button[draggable=true]@'+(v?'mod'+v:'empty'+i) , {onDrag:self._dragging , onDragStart:self._getStartPos , onDragEnd:self._moveItem , } , name);
+                    }))
+                    // d('div.content.grid.grid-8-100' , _.map(this.props.editing,function(v,i) {
+                    //     var name = v?bw.menu.getBy('id',v)[0].name:'';
+                    //     return d('button[draggable=true]@'+(v?'mod'+v:'empty'+i) , {onDrag:self._dragging , onDragStart:self._getStartPos , onDragEnd:self._moveItem , } , name);
+                    // }))
+                ]);
+            }
+        });
+        bw.menu.veiws.admin = React.createClass({
+            
+            componentDidMount:function() {
+
+                var self = this;
+                var node = function(s){return $(self.refs[s].getDOMNode())}
+
+                node('menu').on('click' , function(){
+                   console.log('edit menu') 
+                    React.render(
+                        React.createElement(bw.menu.veiws.editMenu) ,
+                        $('.container')[0]
+                    );
+                });
+                node('back').on('click' , function() {
+
+                    React.render(
+                        React.createElement(bw.menu.veiws.main) ,
+                        $('.container')[0]
+                    );
+
+                });
+
+            } ,
+            render:function() {
+                
+                return d('div.grid.grid-4-100' , _.map(['back',,,,,'employees','menu',,,,,,,,,,],function(v,i) {
+                    var ref = (v?v.replace(/ /g,''):i)
+                    return d('button.'+ref+'@'+ref , v||'');
+                }));
+
+            }
+
+        });
+        bw.menu.veiws.main = React.createClass({
+
+            componentDidMount:function() {
+                
+                var self = this;
+                var node = function(s){return $(self.refs[s].getDOMNode())}
+
+                node('neworder').on('click' , function() {
+                   console.log('new order') 
+                    React.render(
+                        React.createElement(bw.menu.veiws.menu) ,
+                        $('.container')[0]
+                    );
+                });
+                node('orders').on('click' , function() {
+                   console.log('order') 
+                   
+                    React.render(
+                        React.createElement(bw.menu.veiws.openOrders) ,
+                        $('.container')[0]
+                    ); 
+                });
+                node('admin').on('click' , function() {
+                    console.log('admin') 
+                   
+                    React.render(
+                        React.createElement(bw.menu.veiws.admin) ,
+                        $('.container')[0]
+                    ); 
+                });
+                node('back').on('click' , function() {
+
+                    React.render(
+                        React.createElement(bw.menu.veiws.login) ,
+                        $('.container')[0]
+                    );
+
+                });
+
+            } ,
+
+            render:function() {
+                
+                return d('div.grid.grid-4-100' , _.map(['back',,,,,'new order','orders',,,,,,,,'admin',,],function(v,i){
+                    var ref = (v?v.replace(/ /g,''):i)
+                    return d('button.'+ref+'@'+ref , v||'');
+                }))
+
+            }
+
+        });
+        bw.menu.veiws.login = React.createClass({
+            
+            componentDidMount:function() {
+
+                var self = this;
+                var node = function(s){return $(self.refs[s].getDOMNode())}
+                var input = this.refs.val.getDOMNode()
+                $(input).focus();
+
+                node('reset').on('click' , function() {
+                    input.value = '';
+                });
+                $('.keyPad').on('click' , function(){
+                    input.value += this.innerText;
+                });
+
+                node('submit').on('click' , function() {
+                    
+                    bw.user.login(input.value).then(function(me) {
+                        console.log(me)
+                        
+                        bw.menu.cache = {};
+                        bw.menu.cashAll();
+                        
+                        React.render(
+                            React.createElement(bw.menu.veiws.main) ,
+                            $('.container')[0]
+                        );
+                    })
+                    input.value = '';
+
+                })
+
+            },
+            render:function(){
+
+                return d('div.login.centerit' , [
+                    d('div.grid.grid-3-100' , [
+
+                        d('button.keyPad@7' , '7') ,
+                        d('button.keyPad@8' , '8') ,
+                        d('button.keyPad@9' , '9') ,
+                        d('button.keyPad@4' , '4') ,
+                        d('button.keyPad@5' , '5') ,
+                        d('button.keyPad@6' , '6') ,
+                        d('button.keyPad@1' , '1') ,
+                        d('button.keyPad@2' , '2') ,
+                        d('button.keyPad@3' , '3') ,
+                        d('button@reset' , 'clr') ,
+                        d('button.keyPad@0' , '0') ,
+                        d('button@submit'  , 'go') ,
+                        
+                    ]),
+                    d('input.val[type=password][placeholder=pin][value=22978]@val')
+                ])
+
+            }
+        });
+
+        // React.render(
+        //     React.createElement(bw.menu.veiws.login) ,
+        //     $('.container')[0]
+        // );
+        //
+        //////////////////////////
+
+        $.ajaxSetup({
+            headers: {'PIN'  : '22978'} // temp admin pass
+        });
+        bw.menu.cashAll().then(function() {
+            
+            React.render(
+                React.createElement(bw.menu.veiws.editMenu) ,
+                $('.container')[0]
+            );
+        });
+
+    })
+
+}
+
+
+
+
+
+
+
+
