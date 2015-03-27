@@ -25,6 +25,12 @@ function app(){
         {url: "./bower_components/react/react.min.js"},
         {url: "./bower_components/jsnox/jsnox.js"},
 
+        {url: "./js/jquery.swipe.min.js"},
+        {url: "./js/highcharts.js"},
+        {url:'./js/canvg.js'} ,
+        {url:'./js/exporting.js'} ,
+        {url:'./js/rgbcolor.js'} ,
+        {url:'./js/pdf.js'} ,
 
         {url: "./js/mMenu.js"},
         {url: "./js/mOrder.js"},
@@ -35,6 +41,8 @@ function app(){
         {url: "./js/vEmployee.js"},
         {url: "./js/vMenu.js"},
         {url: "./js/vNavigation.js"},
+        {url: "./js/vPayment.js"},
+        {url: "./js/vCharts.js"},
 
 
         // other stuff
@@ -153,7 +161,7 @@ function app(){
         //
  
         $.ajaxSetup({
-            headers: {'PIN'  : '75425'} // temp admin pass
+            headers: {'PIN'  : '95675'} // temp admin pass
         });
 
         React.render(
@@ -163,40 +171,88 @@ function app(){
         //
         //////////////////////////
 
-        // bw.menu.cashAll().then(function() {
-        //     // console.log(bw.menu.cache)
-        //     // var top = bw.menu.getBy('name' , 'top')[0]
-        //     // top.items = _.map(bw.menu.getBy('level' , '1') , function(item){return item.id}).join(',')
-        //     // console.log(top)
-        //     // bw.menu.update(top)
-        //     // console.clear()
-        //     // bw.menu.cache.forEach(function(item){
-        //     //     item.items = '';
-        //     //     bw.menu.update(item);
-        //     // })
-        //     // debugger
-        //     React.render(
-        //         React.createElement(bw.app.views.editMenu) ,
-        //         $('.container')[0]
-        //     );
+        bw.menu.cashAll().then(function() {
+            // console.log(bw.menu.cache)
+            // var top = bw.menu.getBy('name' , 'top')[0]
+            // top.items = _.map(bw.menu.getBy('level' , '1') , function(item){return item.id}).join(',')
+            // console.log(top)
+            // bw.menu.update(top)
+            // console.clear()
+            // bw.menu.cache.forEach(function(item){
+            //     item.items = '';
+            //     bw.menu.update(item);
+            // })
+            // debugger
+            // React.render(
+            //     React.createElement(bw.app.views.newOrder) ,
+            //     $('.container')[0]
+            // );
 
-        //     // React.render(
-        //     //     React.createElement(bw.app.views.newOrder) ,
-        //     //     $('.container')[0]
-        //     // );
-        //     // React.render(
-        //     //     React.createElement(bw.app.views.currentOrders) ,
-        //     //     $('.container')[0]
-        //     // );
-        // });
-        // bw.users.cashAll().then(function() {
+            // React.render(
+            //     React.createElement(bw.app.views.newOrder) ,
+            //     $('.container')[0]
+            // );
+            // React.render(
+            //     React.createElement(bw.app.views.currentOrders) ,
+            //     $('.container')[0]
+            // );
+        });
+        bw.users.cashAll().then(function() {
 
-        //     // React.render(
-        //     //     React.createElement(bw.app.views.editEmployees) ,
-        //     //     $('.container')[0]
-        //     // );
-        // });
+            // React.render(
+            //     React.createElement(bw.app.views.editEmployees) ,
+            //     $('.container')[0]
+            // );
+        });
 
+        (new (Backbone.Router.extend({
+            initialize:function(){
+               Backbone.history.start() 
+            },     
+            routes : {
+                'login' : 'login' ,
+                'main'  : 'main' ,
+                'admin' : 'admin'
+                // '*default' : 'login'
+            } ,
+            login:function(){
+                bw.user.logout()
+                React.render(
+                    React.createElement(bw.app.views.login) ,
+                    $('.container')[0]
+                );
+            } ,
+            main:function(){
+                
+                if (!bw.user.current){
+                    window.location.hash = '';
+                    return;
+                }
+
+                React.render(
+                    React.createElement(bw.app.views.main) ,
+                    $('.container')[0]
+                );
+            } ,
+            admin:function(){
+                
+                if (!bw.user.current){
+                    window.location.hash = '';
+                    return;
+                }
+                
+                React.render(
+                    React.createElement(bw.app.views.admin) ,
+                    $('.container')[0]
+                );
+
+            }
+
+        })))
+        if(('ontouchstart' in window ? 'touchend' : 'click'))
+            $("<style type='text/css'> button , input , textarea {-webkit-appearance: none;-webkit-border-radius: 0;}.back{ display:none} </style>").appendTo("head");
+
+        $(document.body).on( "swiperight", function( event ){window.getSelection().removeAllRanges(); console.log('swipe');bw.history.back()})
     })
 
 }

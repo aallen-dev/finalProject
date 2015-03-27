@@ -4,7 +4,7 @@
 window.bw || (window.bw = {}) ,
 bw.user   || (bw.user   = {});
 bw.user = {
-
+    current : null ,
     login:function(pin){
         // $BASE_URL = https://evening-basin-4204.herokuapp.com/api/v1/sessions
 
@@ -22,6 +22,7 @@ bw.user = {
                 $.ajaxSetup({
                     headers: {'PIN'  : pin}
                 });
+                bw.user.current = pin;
             } ,
             error:function(){
                 console.log('fail')
@@ -29,6 +30,7 @@ bw.user = {
         });
     } ,
     logout:function(){
+        bw.user.current = null;
 
         // Log out user
         $.ajaxSetup({

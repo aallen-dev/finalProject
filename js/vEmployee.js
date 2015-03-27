@@ -6,12 +6,6 @@ bw.app.views || (bw.app.views = {});
 // employee views
 bw.app.views.editEmployeesLeftPanel = React.createClass({
 
-    _goBack:function() {
-        React.render(
-            React.createElement(bw.app.views.admin) ,
-            $('.container')[0]
-        );
-    } ,
     _updateSearch:function(e) {
 
         var val = $(e.currentTarget).val().toLowerCase();
@@ -52,7 +46,6 @@ bw.app.views.editEmployeesLeftPanel = React.createClass({
         return d('div.leftPane@controls', [
             d('div.grid' , [
                 
-                d('button.back@back'               , {onClick:this._goBack}        , 'back') ,
                 d('button.newEmployee@newEmployee' , {onClick:this._goNewEmployee} , 'newEmployee') ,
                 
                 d('input.searchEmployee[placeholder=search]@searchEmployee' , {onChange:this._updateSearch}),
@@ -68,6 +61,12 @@ bw.app.views.editEmployeesLeftPanel = React.createClass({
 });
 bw.app.views.editEmployees = React.createClass({
     
+    _goBack:function() {
+        React.render(
+            React.createElement(bw.app.views.admin) ,
+            $('.container')[0]
+        );
+    } ,
     _save:function() {
 
         var user  = this.props.user ,
@@ -121,7 +120,7 @@ bw.app.views.editEmployees = React.createClass({
 
         var PIN_text = this.props.PIN_text || 'pin generated on server'
         return d('div', [
-            d('div.title@title' , 'edit employees'),
+            d('div.title@title' , [d('button.back@back' , {onClick:this._goBack} , 'back') , 'edit employees']),
             
             d(bw.app.views.editEmployeesLeftPanel) ,
             d('div.content.grid.grid-2-100' , ( user ? [

@@ -131,6 +131,7 @@
  * GENERAL
  */
 html , body {
+        overflow:hidden;
     height:100%;
 }
 .centerit{
@@ -142,12 +143,22 @@ html , body {
 img {max-width:100%;}
 *{
     // transition: all 1s ease;
+          user-select: none;
+      -moz-user-select: none;  
+      -webkit-user-select: none;  
+      -ms-user-select: none;
 
 }
 body {
     transition: opacity 1s ease;
     #payment-form{display:none}
     .container{
+        button.back {
+          position: absolute;
+          // display:inline-block;
+          top:0px;
+          left: 0px;
+        }
         height:100%;
         overflow:hidden;
         span:empty{
@@ -252,7 +263,8 @@ body {
                 // border-radius: 5px;
                 // margin:0.1%;
                 // height:10%;
-                height:12.5%;
+                // height:12.5%;
+                height:16.8%;
             }
             
         }
@@ -269,7 +281,7 @@ body {
             }
         }
         .itemDesc{
-            border-bottom:1px solid #ddd;
+            border-top:1px solid #ddd;
             width:80%;
             text-align: left;
             padding-left:5px;
@@ -280,10 +292,11 @@ body {
             text-align: right;
             padding-right:15px;
             width:20%;
-            border-bottom:1px solid #ddd;
+            border-top:1px solid #ddd;
         }
         .closed {
-            opacity:.5
+            opacity:.5;
+            color:red;
         }
         button:empty{
             opacity:.2
@@ -294,11 +307,24 @@ body {
         .back{
             color:red
         }
+        .grid.orderList {
+          // color: red;
+          overflow-y: auto;
+        }
+        .grid.orderList , .previewOrder {
+            // height: 100% !important;
+            border:1px solid #000;
+            height:98.5%;
+
+        }
+        .openOrder{
+            top: -60px;
+            position: relative;
+        }
         .previewOrder{
             // position:relative;
             display:inline-block;
-            height:100%;
-            border:1px solid #aaa;
+            // border:1px solid #aaa;
         }
         .preview:empty{
             display:none;
@@ -332,6 +358,21 @@ body {
             -o-transform:  scale(3); /* Opera */
             // padding: 10px;
         }
+        .content.grid.grid-8-100{
+            height:12.5*6%;
+            // border-bottom:1px solid red;
+        }
+        .bottom{
+            position:absolute;
+            right:0;;
+            bottom:0px;
+            width:70%;
+            height:20% !important;
+            border:1px solid #ccc;
+            &>*{
+                height:50%
+            }
+        }
     }
 
 }
@@ -340,11 +381,7 @@ body {
 
 
 
-.grid.orderList {
-  // color: red;
-  overflow-y: auto;
-  height: 100% !important;
-}
+
 .red{
     background-color:red;
     color:#fff;

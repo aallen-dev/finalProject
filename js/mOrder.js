@@ -5,6 +5,8 @@ bw.orders || (bw.orders = {});
 
 bw.orders = {
     cache : [] ,
+    // cacheReady:false ,
+    // currentOrder:[] ,
     // $BASE_URL = https://evening-basin-4204.herokuapp.com/api/v1
     // All actions require a header with "Authorization" set to the user's authentication token.
     getAll:function() {
@@ -14,6 +16,7 @@ bw.orders = {
         var p = $.Deferred();
 
         $.get('https://evening-basin-4204.herokuapp.com/api/v1/chits').then(function(results){
+            // debugger
             p.resolve(results.chits)
         })
         return p
@@ -21,9 +24,10 @@ bw.orders = {
     cashAll : function(){
         
         var p = $.Deferred()
-
+        // this.cacheReady = false;
         this.getAll().then(function(d){
             // console.log(d)
+            // this.cacheReady = true;
             // debugger
             bw.orders.cache = d;
             p.resolve();
@@ -36,7 +40,15 @@ bw.orders = {
         // Send an array of arrays of menu item IDs to put on chit
         // POST $BASE_URL/chits
         // var testDat = { "chit": { "chit_items": { [1, 3, 5], [2, 5, 6], [1, 3, 6, 7] } } }
-        return $.post('https://evening-basin-4204.herokuapp.com/api/v1/chits' , {"chit": {"chit_items": ticket }});
+        var p = $.Deferred()
+
+        $.post('https://evening-basin-4204.herokuapp.com/api/v1/chits' , {"chit": {"chit_items": ticket }}).then(function(chit){
+
+            bw.orders.cache.push(chit.chit)
+            p.resolve(chit.chit)
+        });
+
+        return p;
     } ,
     fakeGetAll:function() {alert('phony!!!!')
         var p = $.Deferred()
@@ -87,22 +99,60 @@ bw.orders = {
 
         return bw.menu.delete(id)
     } ,
-    update:function(ticket) {alert()
-        return this.fakeUpdate(ticket);
+    update:function(data) {//alert()
+        // return this.fakeUpdate(ticket);
         // Update Chit
         // New items passed will actually create new rows, not delete previous items. Status can be updated
         // :id is the id of the chit
         // PUT $BASE_URL/chits/:id
         // { "chit": { "chit_items": { [1, 5] }, "status": "closed" } } }
-        return $.ajax({
-            url  : 'https://evening-basin-4204.herokuapp.com/api/v1/chits/'+ticket.id,
+        var tmp = {}
+            if (data.items)
+               tmp.chit_items = data.items;
+
+            if (data.status)
+               tmp.status = data.status
+
+            if (data.void)
+               tmp.void = data.void
+
+            // data : {chit:tmp}
+        // debugger
+        var p = $.Deferred()
+        $.ajax({
+            url  : 'https://evening-basin-4204.herokuapp.com/api/v1/chits/' + data.id,
             type : 'PUT' ,
-            data : {chit:{chit_items:ticket.items,status:ticket.status}}
-        })
+            // data : {chit:{chit_items:data.items,status:data.status , void:data.void||[]}}
+            data : {chit:tmp}
+        }).then(function(chit){
+            // bw.orders.cache.push(chit.chit)
+            // debugger
+            bw.orders.cache.forEach(function(item , index , arr) {
+                if (item.id==data.id)
+                    arr[index] = chit.chit;
+            });
+            p.resolve(chit.chit)
+        });
+        return p;
     } ,
     delete:function(id) {
 
-        return this.fakeDelete(id)
+        var p = $.Deferred()
+
+        // debugger
+        $.ajax({
+            url: 'https://evening-basin-4204.herokuapp.com/api/v1/chits/'+id,
+            type: 'DELETE'
+        }).then(function(data) {
+            console.log(id + ' deleted')
+            bw.orders.cache.forEach(function(item , index , arr) {
+                if (item.id==id)
+                    arr.splice(index , 1)
+            });
+            p.resolve(data);
+        });
+        return p;
+        // return this.fakeDelete(id)
     } ,
     getBy : function (filter , matches) {
         
@@ -129,12 +179,31 @@ bw.orders = {
 //////////////////////////
 //////////////////////////
 // testing
-// bw.orders.getAll().then(function(data) {
-//     // console.clear()
 
-//     console.log(_.map(data,function(d){return d.id}))
+
+$.ajaxSetup({
+    headers: {'PIN'  : '95675'} // temp admin pass
+});
+// bw.orders.getAll().then(function(data) {
+//     console.clear()
+    // debugger    
+// //     // bw.orders.delete(data[1].id)
+// //     // _.forEach(data,function(d){
+// //     //     bw.orders.delete(d.id)
+// //     // })
+    
+// //     // console.clear()
+
+// // //     console.log(_.map(data,function(d){return d.id}))
 // });
-// bw.orders.getBy('id','28').then(function(results) {
+
+// bw.orders.delete(2)
+// bw.orders.update({id:1 , items:null , status:'open' , void:[1]})
+// bw.orders.update({id:1 , items:[[1,2,3]] , status:'open' , void:null})
+// bw.orders.update({id:1 , items:[[1,2,3]] , status:'open' , void:[2]})
+
+// bw.orders.getBy('id','2').then(function(results) {
+
 //     var chit = results[0];
 
 // //     chit.status = 'closed'
@@ -145,3 +214,28 @@ bw.orders = {
 // bw.orders.add([[1],[2,3,4],[3]])
 //
 //////////////////////////
+
+
+// ```
+//     data : {chit:{chit_items:data.items||null,status:data.status||null , void:data.void||[]}}
+// ```
+// vs
+// ```
+//     var tmp = {}
+//     if (data.items)
+//         tmp.chit_items = data.items;
+
+//     if (data.status)
+//         data.status = data.status 
+
+//     if (data.void)
+//         tmp.void = data.void
+    
+//     data : {chit:tmp}
+// ```
+// I mean, yuck...
+
+
+
+
+

@@ -3,14 +3,58 @@
 
 <head>
     <title></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta id="extViewportMeta" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">  
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <!-- if using browserify, uncomment the line below -->
     <!-- <link rel="stylesheet" type="text/css" href="./dist/style.css"> -->
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+    <style>
+    .container div .delete{
+        background-color: red;
+        right: 0px;
+        text-align: center;
+        width: 30px;
+        height: 30px;
+        position: absolute;
+        display: inline-block;
+
+    }
+    .hidden{
+        opacity:0;
+    }
+      html, body {margin: 0; padding: 0; overflow: hidden;
+width: 100%;
+position: fixed;}
+    </style>
 </head>
 
 <body>
+  <script>
+    // document.body.addEventListener('touchmove', function(event) {
+    //   console.log(event.source);
+    //   // alert(event.currentTarget)
+    //   // if (event.source == document.body)
+    //     event.preventDefault();
+    // }, false);
+ 
+    // window.onresize = function() {
+    //   $(document.body).width(window.innerWidth).height(window.innerHeight);
+    // }
+ 
+    // $(function() {
+    //   window.onresize();
+    // });
+  </script>
+<div style="display:none">
+<a href="https://mkt.com/BlazinWeb" class="sq-embed-menu">Order Online</a>
+</div>
+<!-- <script src="https://cdn.sq-api.com/market/embed.js" id="sq-embed-js" charset="utf-8"></script> -->
+
     <form action="" method="POST" id="payment-form"></form>
     <div class="container">
 

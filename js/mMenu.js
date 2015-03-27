@@ -1,3 +1,4 @@
+JSON.copy || (JSON.copy = function(d){return JSON.parse(JSON.stringify(d));});
 window.bw || (window.bw = {}) ,
 bw.menu   || (bw.menu   = {});
 
@@ -154,6 +155,7 @@ bw.menu = {
             url: 'https://evening-basin-4204.herokuapp.com/api/v1/menu_items/'+id,
             type: 'DELETE'
         }).then(function(data) {
+            console.log(id + ' deleted')
             bw.menu.cache.forEach(function(item , index , arr) {
                 if (item.id==id)
                     arr.splice(index , 1)
@@ -175,16 +177,41 @@ bw.menu = {
 // // testing
 //     // 
 
-//     // $.ajaxSetup({
-//     //     headers: {'PIN'  : '75425'} // temp admin pass
-//     // });
-//     // bw.menu.getAll().then(function(data){
-//     //     data.menu_items.sort(function(a,b){
-//     //         // console.log(a.id,b.id)
-//     //         return a.id-b.id
-//     //     })
-//     //     console.log(JSON.stringify(data))
-//     // })
+    // $.ajaxSetup({
+    //     headers: {'PIN'  : '95675'} // temp admin pass
+    // });
+//         var dat={"menu_items":[{"id":1,"level":2,"name":"test2","price":1E3,"sub_level":null,"items":"","template":""},{"id":2,"level":0,"name":"top","price":1E3,"sub_level":null,"items":"7,,3,,4,,8,,,11,,9,,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,10","template":""},{"id":3,"level":1,"name":"burgers","price":1E3,"sub_level":null,"items":",,,,,,,,,,20,,,,,,,22,,19","template":""},{"id":4,"level":1,"name":"samiches","price":0,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,17,16,21","template":""},{"id":5,
+// "level":1,"name":"red","price":3,"sub_level":null,"items":"","template":""},{"id":6,"level":1,"name":"food num num","price":0,"sub_level":null,"items":"","template":""},{"id":7,"level":1,"name":"steaks","price":1E3,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,15,18","template":""},{"id":8,"level":1,"name":"veggies","price":2,"sub_level":null,"items":"","template":""},{"id":9,"level":1,"name":"beans","price":0,"sub_level":null,"items":"","template":""},{"id":10,"level":1,"name":"help, i'm trapped in a menu",
+// "price":666,"sub_level":null,"items":"","template":""},{"id":11,"level":1,"name":"some item","price":0,"sub_level":null,"items":"","template":""},{"id":12,"level":1,"name":"c","price":0,"sub_level":null,"items":"","template":""},{"id":13,"level":1,"name":"a","price":0,"sub_level":null,"items":"","template":""},{"id":14,"level":1,"name":"b","price":0,"sub_level":null,"items":"","template":""},{"id":15,"level":2,"name":"sirloin","price":0,"sub_level":null,"items":"","template":""},{"id":16,"level":2,
+// "name":"rueben","price":1E3,"sub_level":null,"items":",,,,,,,,,,26,25,23","template":""},{"id":17,"level":2,"name":"turkey","price":1E3,"sub_level":null,"items":",,,,,,,,,,26,25,23","template":""},{"id":18,"level":2,"name":"t-bone","price":0,"sub_level":null,"items":"","template":""},{"id":19,"level":2,"name":"big mac","price":0,"sub_level":null,"items":"","template":""},{"id":20,"level":2,"name":"whopper","price":500,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,24","template":""},{"id":21,"level":2,
+// "name":"ham & swiss","price":1E3,"sub_level":null,"items":",,,,,,,,,,26,25,23","template":""},{"id":22,"level":2,"name":"guac burger","price":0,"sub_level":null,"items":"","template":""},{"id":23,"level":3,"name":"sour dough","price":0,"sub_level":null,"items":"","template":""},{"id":24,"level":3,"name":"tomatoes","price":0,"sub_level":null,"items":"","template":""},{"id":25,"level":3,"name":"rye","price":0,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,27","template":""},{"id":26,"level":3,"name":"wheat",
+// "price":0,"sub_level":null,"items":"","template":""},{"id":27,"level":3,"name":"toasted","price":0,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,28","template":""},{"id":28,"level":3,"name":"no crust","price":0,"sub_level":null,"items":"","template":null}]};
+    // full seed/reset (run twice for seeding)
+    // bw.menu.getAll().then(function(items){
+        
+    //     if (items.menu_items.length<10)
+    //         dat.menu_items.forEach(function(item) {
+    //             delete item.id;
+    //             bw.menu.add(item);
+    //         });
+        
+    //     try {
+    //     dat.menu_items.forEach(function(item) {
+    //         bw.menu.update(item);
+    //     });
+    //     }catch(e){}// while seeding this is hit||miss (that's why we run it twice)
+    //     // debugger
+    //     items.menu_items.forEach(function(item) {
+    //         // debugger
+    //         if(item.id>28)
+    //             bw.menu.delete(item.id)
+    //     });
+    //     // items.menu_items.sort(function(a,b){
+    //     //     // console.log(a.id,b.id)
+    //     //     return a.id-b.id
+    //     // })
+    //     // console.log(JSON.stringify(items))
+    // })
     
 //     // bw.menu.get({id:7}).then(function(data) {
 //     //     data.menu_item.name = 'item 7'
@@ -233,43 +260,38 @@ bw.menu = {
 //     // })
 //     // bw.menu.delete(32)
 //     // bw.menu.delete(31)
-//     var dat={"menu_items":[{"id":1,"level":2,"name":"test2","price":1E3,"sub_level":null,"items":"","template":""},{"id":2,"level":0,"name":"top","price":1E3,"sub_level":null,"items":"7,,3,,4,,8,,,11,,9,,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,10","template":""},{"id":3,"level":1,"name":"burgers","price":1E3,"sub_level":null,"items":",,,,,,,,,,20,,,,,,,22,,19","template":""},{"id":4,"level":1,"name":"samiches","price":0,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,17,16,21","template":""},{"id":5,
-// "level":1,"name":"red","price":3,"sub_level":null,"items":"","template":""},{"id":6,"level":1,"name":"food num num","price":0,"sub_level":null,"items":"","template":""},{"id":7,"level":1,"name":"steaks","price":1E3,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,15,18","template":""},{"id":8,"level":1,"name":"veggies","price":2,"sub_level":null,"items":"","template":""},{"id":9,"level":1,"name":"beans","price":0,"sub_level":null,"items":"","template":""},{"id":10,"level":1,"name":"help, i'm trapped in a menu",
-// "price":666,"sub_level":null,"items":"","template":""},{"id":11,"level":1,"name":"some item","price":0,"sub_level":null,"items":"","template":""},{"id":12,"level":1,"name":"c","price":0,"sub_level":null,"items":"","template":""},{"id":13,"level":1,"name":"a","price":0,"sub_level":null,"items":"","template":""},{"id":14,"level":1,"name":"b","price":0,"sub_level":null,"items":"","template":""},{"id":15,"level":2,"name":"sirloin","price":0,"sub_level":null,"items":"","template":""},{"id":16,"level":2,
-// "name":"rueben","price":1E3,"sub_level":null,"items":",,,,,,,,,,26,25,23","template":""},{"id":17,"level":2,"name":"turkey","price":1E3,"sub_level":null,"items":",,,,,,,,,,26,25,23","template":""},{"id":18,"level":2,"name":"t-bone","price":0,"sub_level":null,"items":"","template":""},{"id":19,"level":2,"name":"big mac","price":0,"sub_level":null,"items":"","template":""},{"id":20,"level":2,"name":"whopper","price":500,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,24","template":""},{"id":21,"level":2,
-// "name":"ham & swiss","price":1E3,"sub_level":null,"items":",,,,,,,,,,26,25,23","template":""},{"id":22,"level":2,"name":"guac burger","price":0,"sub_level":null,"items":"","template":""},{"id":23,"level":3,"name":"sour dough","price":0,"sub_level":null,"items":"","template":""},{"id":24,"level":3,"name":"tomatoes","price":0,"sub_level":null,"items":"","template":""},{"id":25,"level":3,"name":"rye","price":0,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,27","template":""},{"id":26,"level":3,"name":"wheat",
-// "price":0,"sub_level":null,"items":"","template":""},{"id":27,"level":3,"name":"toasted","price":0,"sub_level":null,"items":",,,,,,,,,,,,,,,,,,28","template":""},{"id":28,"level":3,"name":"no crust","price":0,"sub_level":null,"items":"","template":null}]};
     
 
 //     // // debugger
-//     dat.menu_items.forEach(function(item , i){
-//         // delete item.id
-//         // delete item.parent_id
 
-//     //     var data = item.name.split('{{json}}')[1]
+    // dat.menu_items.forEach(function(item , i){
+        // delete item.id
+        // delete item.parent_id
+
+    //     var data = item.name.split('{{json}}')[1]
         
-//     //     if (data) {
-//     //         data = JSON.parse(data);
+    //     if (data) {
+    //         data = JSON.parse(data);
 
-//     //         _.forEach(data , function(val , key){
-//     //             item[key] = val;
-//     //         })
-//     //     }
+    //         _.forEach(data , function(val , key){
+    //             item[key] = val;
+    //         })
+    //     }
 
-//     //     item.name = item.name.split('{{json}}')[0]
-//     //     // debugger
-//     //     _.delay(function(){
-//             bw.menu.update(item)
-//     //             .then(function(data){
+    //     item.name = item.name.split('{{json}}')[0]
+    //     // debugger
+        // _.delay(function(){
+            // bw.menu.update(item)
+            //     .then(function(data){
 
-//     //                 // bw.menu.getAll().then(function(data){
-//     //                     console.log('pass')
-//     //                     console.log(data)
-//     //                 // })
+            //         // bw.menu.getAll().then(function(data){
+            //             console.log('pass')
+            //             console.log(data)
+            //         // })
 
-//     //             })
-//     //     } , 5000 * i)
-//     })
+            //     })
+        // } , 5000 * i)
+    // })
 //     //
 //     //
 // //////////////////////////

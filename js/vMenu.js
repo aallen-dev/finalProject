@@ -40,12 +40,6 @@ bw.app.views.editMenuLeftPanel = React.createClass({
 
         // });
     } ,
-    _goBack:function() {
-        React.render(
-            React.createElement(bw.app.views.admin) ,
-            $('.container')[0]
-        );
-    } ,
     _updateTable:function() {
         var self = this;
 
@@ -218,7 +212,7 @@ bw.app.views.editMenuLeftPanel = React.createClass({
             })
         }
     } ,
-//
+
     render:function() {
         
         var self = this;
@@ -226,7 +220,6 @@ bw.app.views.editMenuLeftPanel = React.createClass({
         console.log(item.level)
         if (!this.props.edit)
             return d('div.grid.leftPane@controls' , [
-                d('button.back@back' , {onClick:this._goBack} , 'back') ,
                 (item.level>0?d('button.up@up' , {onClick:this._goUp} , 'up'):'')
             ])
         
@@ -236,7 +229,7 @@ bw.app.views.editMenuLeftPanel = React.createClass({
         return d('div.leftPane@controls' , [
         
             d('div.grid' , [
-                d('button.back@back' , {onClick:this._goBack} , 'back') ,
+                // d('button.back@back' , {onClick:this._goBack} , 'back') ,
                 (item.level>0?d('button.up@up' , {onClick:this._goUp} , 'up'):'') ,
                 d('div.formName' , ['name' , d('input[defaultValue='+this.props.edit.name+']@nameInput' , {onBlur:this._clearPreview , onChange:this._updateButton})]) ,
                 d('div.preview' , (this.props.preview&&this.props.preview.length>1)?[d('div.previewCont' , _.map(this.props.preview , function(item , index) {
@@ -257,8 +250,15 @@ bw.app.views.editMenuLeftPanel = React.createClass({
         ]);
     }
 });
+
 bw.app.views.editMenu = React.createClass({
     
+    _goBack:function() {
+        React.render(
+            React.createElement(bw.app.views.admin) ,
+            $('.container')[0]
+        );
+    } ,
     _moveItem:function(e,reactid) {
         var nextTier = JSON.parse($(e.currentTarget).attr('data'));
         // debugger
@@ -321,7 +321,7 @@ bw.app.views.editMenu = React.createClass({
 
         this.forceUpdate();
     } ,
-    
+
     _editSub:function(e) {
         var nextTier = JSON.parse($(e.currentTarget).attr('data'));
 
@@ -345,11 +345,11 @@ bw.app.views.editMenu = React.createClass({
         var layout    = this.props.currentTier.items.split(',');
         var levelName = (this.props.currentTier.level == 0 ? 'menu groups' : ( this.props.currentTier.level == 1 ? 'group ': 'item ') + this.props.currentTier.name );
         // pad our array to the appropriate length
-        while(layout.length<64)
+        while(layout.length<48)
             layout.push(null);
 
         return d('div' , [
-            d('div.title@title' , levelName),
+            d('div.title@title' , [d('button.back@back' , {onClick:this._goBack} , 'back') , levelName]),
             d(bw.app.views.editMenuLeftPanel , {currentTier:this.props.currentTier , button:this.props.buttonEditing , openGroup:this.props.currentTier.id , edit:this.props.modEditing}) ,
 
             d('div.content.grid.grid-8-100' , _.map(layout,function(v , i) {
@@ -372,16 +372,10 @@ bw.app.views.editMenu = React.createClass({
 
 bw.app.views.editBreakdownLeftPanel = React.createClass({
 
-    _goBack:function() {
-        React.render(
-            React.createElement(bw.app.views.admin) ,
-            $('.container')[0]
-        );
-    } ,
     render:function() {
         return d('div.leftPane@controls', [
             d('div.grid' , [
-                d('button.back@back' , {onClick:this._goBack} , 'back') ,
+                // d('div' , 'back') ,
             ])
         ])
     }
@@ -389,9 +383,15 @@ bw.app.views.editBreakdownLeftPanel = React.createClass({
 });
 bw.app.views.editBreakdown = React.createClass({
 
+    _goBack:function() {
+        React.render(
+            React.createElement(bw.app.views.admin) ,
+            $('.container')[0]
+        );
+    } ,
     render:function() {
         return d('div', [
-            d('div.title@title' , 'edit menu'),
+            d('div.title@title' , [d('button.back@back' , {onClick:this._goBack} , 'back') , 'edit menu']),
             
             d(bw.app.views.editBreakdownLeftPanel) ,
 
