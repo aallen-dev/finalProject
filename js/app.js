@@ -162,7 +162,7 @@ function app(){
  
         $.ajaxSetup({
             headers: {'PIN'  : '95675'} // temp admin pass
-        });
+        }); 
 
         React.render(
             React.createElement(bw.app.views.login) ,
