@@ -65,12 +65,12 @@ bw.app.views.newOrderLeftPanel = React.createClass({
                     d('div.previewOrder.grid.grid-2-100' , chit.map(function(item , i){
                         // debugger
                         return  [
-                            d('div.itemDesc@'+i , { data: s([item , i]) , onTouchStart: self._showDelete } , _.pluck(item , 'name').map(function(name) {
+                            d('div.itemDesc@'+i , { data: s([item , i]) , onClick: self._showDelete } , _.pluck(item , 'name').map(function(name) {
                                 return name
                             }).join('/')),
                             d('div.itemPrice@p'+i , [_.pluck(item , 'price').map(function(price) {
                                 return price/100
-                            }).sum()+'' , d('div.hidden.delete@delete'+i , { data: s([item , i]) , onTouchStart: self._delete } , 'x')])
+                            }).sum()+'' , d('div.hidden.delete@delete'+i , { data: s([item , i]) , onClick: self._delete } , 'x')])
                         ]
                     }))
                     : d('div')
@@ -142,7 +142,7 @@ bw.app.views.newOrder = React.createClass({
         if (!data)
             return;
         var payView = function(chit) {
-            // debugger;
+            // alert(data)
             if (data == 'pay'){
                 bw.history.add('payment');
                 React.render(
@@ -202,7 +202,7 @@ bw.app.views.newOrder = React.createClass({
         // debugger
         return d('div', [
                 
-            d('div.title@title' , [d('button.back@back' , {onTouchStart:this._goBack} , 'back') , 'new order']),
+            d('div.title@title' , [d('button.back@back' , {onClick:this._goBack} , 'back') , 'new order']),
             
             d(bw.app.views.newOrderLeftPanel , {chitRaw:this.props.chitRaw , chit:this.props.chit}) ,
 
@@ -212,13 +212,13 @@ bw.app.views.newOrder = React.createClass({
                 
                 return d('button@'+(v?'mod'+v:'empty'+i) , {
                     data:s(item) , 
-                    onTouchStart : self._nextTier 
-                  //  onTouchStart : self._nextTier
+                    onClick : self._nextTier 
+                  //  onClick : self._nextTier
                 } , v ? item.name : '');
             })),
             d('div.grid.grid-3-100.bottom' , _.map(['cancel',,'done',,,'pay'] , function(v , i) {
                 var ref = (v?v.replace(/ /g,''):i)
-                return d('button.'+ref+'@'+ref , {data:v , onTouchStart:self._handleClick} , v || '');
+                return d('button.'+ref+'@'+ref , {data:v , onClick:self._handleClick} , v || '');
             })) ,
         ])
     }
@@ -250,10 +250,10 @@ bw.app.views.currentOrdersLeftPanel = React.createClass({
             d('div.grid' , [
 
                 d('div.formControls.grid.grid-2-100' , [
-                    d('button.formShowOpen@open'       , {data:s({sort:'open'})    , onTouchStart:this._showSort} , 'open orders') ,
-                    d('button.formShowClosed@closed'   , {data:s({sort:'closed'})  , onTouchStart:this._showSort} , 'closed orders') ,
-                    d('button.formShowDeleted@deleted' , {data:s({sort:'deleted'}) , onTouchStart:this._showSort} , 'deleted orders') ,
-                    d('button.formShowOther@all'       , {data:s({sort:'.'})       , onTouchStart:this._showSort} , 'all orders')
+                    d('button.formShowOpen@open'       , {data:s({sort:'open'})    , onClick:this._showSort} , 'open orders') ,
+                    d('button.formShowClosed@closed'   , {data:s({sort:'closed'})  , onClick:this._showSort} , 'closed orders') ,
+                    d('button.formShowDeleted@deleted' , {data:s({sort:'deleted'}) , onClick:this._showSort} , 'deleted orders') ,
+                    d('button.formShowOther@all'       , {data:s({sort:'.'})       , onClick:this._showSort} , 'all orders')
                 ])
             ])
         ])
@@ -307,7 +307,7 @@ bw.app.views.currentOrders = React.createClass({
         var preview = this.props.displayPreview;
         // debugger
         return d('div', [
-            d('div.title@title' , [d('button.back@back' , {onTouchStart:this._goBack} , 'back') , 'orders']),
+            d('div.title@title' , [d('button.back@back' , {onClick:this._goBack} , 'back') , 'orders']),
             
             d(bw.app.views.currentOrdersLeftPanel) ,
 
@@ -315,7 +315,7 @@ bw.app.views.currentOrders = React.createClass({
                 ( results ?
                     
                     d('div.grid.orderList' , _.map(results.sort(function(a,b){return a.id>b.id?1:-1}) , function(order , i) {
-                        return d('button.'+order.status+'@' + i , {data:s(order),onTouchStart:self._showPreview} , 'order #'+order.id)
+                        return d('button.'+order.status+'@' + i , {data:s(order),onClick:self._showPreview} , 'order #'+order.id)
                     }) )
                     
                     : 'orders'
@@ -339,7 +339,7 @@ bw.app.views.currentOrders = React.createClass({
 
                         }) ) ,
                         d('div',''),
-                        (preview.status=='open'?d('button.openOrder@openOrder' , {onTouchStart:this._openOrder} , 'open'):'')
+                        (preview.status=='open'?d('button.openOrder@openOrder' , {onClick:this._openOrder} , 'open'):'')
                     ]
                     : 'preview'
                 )

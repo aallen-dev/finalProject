@@ -171,7 +171,7 @@ function app(){
         //
         //////////////////////////
 
-        bw.menu.cashAll().then(function() {
+        // bw.menu.cashAll().then(function() {
             // console.log(bw.menu.cache)
             // var top = bw.menu.getBy('name' , 'top')[0]
             // top.items = _.map(bw.menu.getBy('level' , '1') , function(item){return item.id}).join(',')
@@ -196,7 +196,7 @@ function app(){
             //     React.createElement(bw.app.views.currentOrders) ,
             //     $('.container')[0]
             // );
-        });
+        // });
         bw.users.cashAll().then(function() {
 
             // React.render(
@@ -212,7 +212,8 @@ function app(){
             routes : {
                 'login' : 'login' ,
                 'main'  : 'main' ,
-                'admin' : 'admin'
+                'admin' : 'admin',
+                'editMenu' : 'editMenu'
                 // '*default' : 'login'
             } ,
             login:function(){
@@ -246,11 +247,23 @@ function app(){
                     $('.container')[0]
                 );
 
-            }
+            },
+            editMenu:function(){
+                bw.menu.cashAll().then(function() {
+
+                    $.ajaxSetup({
+                        headers: {'PIN'  : '95675'} // temp admin pass
+                    });
+                    React.render(
+                        React.createElement(bw.app.views.editMenu) ,
+                        $('.container')[0]
+                    );
+                });
+            } ,
 
         })))
-        if(('ontouchstart' in window ? 'touchend' : 'click'))
-            $("<style type='text/css'> button , input , textarea {-webkit-appearance: none;-webkit-border-radius: 0;}.back{ display:none} </style>").appendTo("head");
+        // if(('ontouchstart' in window ? 'touchend' : 'click'))
+        //     $("<style type='text/css'> button , input , textarea {-webkit-appearance: none;-webkit-border-radius: 0;}.back{ display:none} </style>").appendTo("head");
 
         $(document.body).on( "swiperight", function( event ){window.getSelection().removeAllRanges(); console.log('swipe');bw.history.back()})
     })

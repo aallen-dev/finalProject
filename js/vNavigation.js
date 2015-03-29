@@ -25,7 +25,7 @@ bw.app.views.admin = React.createClass({
         var self = this;
         var node = function(s){return $(self.refs[s].getDOMNode())}
 
-        node('menu').on('touchstart' , function(){
+        node('menu').on('click' , function(){
             console.log('edit menu') 
             bw.history.add('editMenu');
             bw.menu.editing = [];
@@ -34,7 +34,7 @@ bw.app.views.admin = React.createClass({
                 $('.container')[0]
             );
         });
-        node('employees').on('touchstart' , function(){
+        node('employees').on('click' , function(){
             console.log('edit employees') 
             bw.history.add('editEmpoloyees');
             React.render(
@@ -43,7 +43,7 @@ bw.app.views.admin = React.createClass({
             );
         });
         _.forEach([node('editcategories') , node('edititems') , node('editmodifiers')] , function(node) {
-            node.on('touchstart' , function(){
+            node.on('click' , function(){
 
                 React.render(
                     React.createElement(bw.app.views.editBreakdown ) ,
@@ -53,7 +53,7 @@ bw.app.views.admin = React.createClass({
             })
         });
 
-        node('salesbycategories').on('touchstart' , function(){
+        node('salesbycategories').on('click' , function(){
             console.log('sales by categories') 
             bw.history.add('salesByCategories');
             React.render(
@@ -61,7 +61,7 @@ bw.app.views.admin = React.createClass({
                 $('.container')[0]
             );
         });
-        node('alcoholsales').on('touchstart' , function(){
+        node('alcoholsales').on('click' , function(){
             console.log('alcohol sales') 
             bw.history.add('alcoholSales');
             React.render(
@@ -83,7 +83,7 @@ bw.app.views.admin = React.createClass({
                 var ref = (v?v.replace(/ /g,''):i)
                 return d('button.'+ref+'@'+ref , v||'');
             })),
-            d('button.back@back' , {onTouchStart:this._goBack} , 'back')
+            d('button.back@back' , {onClick:this._goBack} , 'back')
         ]);
 
     }
@@ -95,7 +95,7 @@ bw.app.views.main = React.createClass({
         var self = this;
         var node = function(s){return $(self.refs[s].getDOMNode())}
 
-        node('neworder').on('touchstart' , function() {
+        node('neworder').on('click' , function() {
            console.log('new order') 
             bw.history.add('newOrder');
             React.render(
@@ -103,7 +103,7 @@ bw.app.views.main = React.createClass({
                 $('.container')[0]
             );
         });
-        node('orders').on('touchstart' , function() {
+        node('orders').on('click' , function() {
             console.log('order') 
             
             // for the demo, we are caching this at login to be more snappy.
@@ -118,7 +118,7 @@ bw.app.views.main = React.createClass({
                 ); 
             // });
         });
-        node('admin').on('touchstart' , function() {
+        node('admin').on('click' , function() {
             console.log('admin') 
             bw.history.add('admin');
            
@@ -129,7 +129,8 @@ bw.app.views.main = React.createClass({
         });
 
     } ,
-    _goBack:function() {
+    _goBack:function() {//alert()
+        // bw.history.back();
         React.render(
             React.createElement(bw.app.views.login) ,
             $('.container')[0]
@@ -143,7 +144,7 @@ bw.app.views.main = React.createClass({
                             var ref = (v?v.replace(/ /g,''):i)
                             return d('button.'+ref+'@'+ref , v||'');
                         })),
-            d('button.back@back' , {onTouchStart:this._goBack} , 'back')
+            d('button.back@back' , {onClick:this._goBack} , 'back')
         ])
 
     }
@@ -157,14 +158,14 @@ bw.app.views.login = React.createClass({
         var input = this.refs.val.getDOMNode()
         $(input).focus();
 
-        node('reset').on('touchstart' , function() {
+        node('reset').on('click' , function() {
             input.value = '';
         });
-        $('.keyPad').on('touchstart' , function(){
+        $('.keyPad').on('click' , function(){
             input.value += this.innerText;
         });
 
-        node('submit').on('touchstart' , function() {
+        node('submit').on('click' , function() {
             
             bw.user.login(input.value).then(function(me) {
                 console.log(me)
